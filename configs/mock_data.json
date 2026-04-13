@@ -1,7 +1,7 @@
 {
   "header_tags": [
     "当前模式：原型验证",
-    "当前阶段：5.3.2 可解释生成与增强"
+    "当前阶段：5.3.3 轻量识别训练与推理"
   ],
   "status_badges": [
     "系统状态：正常",
@@ -406,5 +406,103 @@
       "distribution_change": "类别分布变化：pilotShip 13 → 253（增强前后对比），长尾类别均衡性提升。",
       "output_dir": "/outputs/aug_dataset/shipsear_aug_v2"
     }
+  },
+  "recognition_page": {
+    "task_config": {
+      "datasets": [
+        "ShipsEar",
+        "DeepShip"
+      ],
+      "data_sources": [
+        "真实样本",
+        "增强样本",
+        "真实+增强"
+      ],
+      "run_modes": [
+        "训练",
+        "微调",
+        "推理"
+      ],
+      "task_name": "REC-UTEAT-Shipsear-FT-01",
+      "output_dir": "/outputs/recognition/uteat_shipsear",
+      "class_schema": "ShipsEar 12 类 + 背景噪声类别"
+    },
+    "model_config": {
+      "model_name": "UT-EAT",
+      "backbone": "Tiny-Attention Encoder + Temporal Head",
+      "batch_size": 32,
+      "learning_rate": 0.0005,
+      "epochs": 60,
+      "optimizer": "AdamW",
+      "use_pretrained": true,
+      "use_augmented_data": true,
+      "checkpoint_dir": "/checkpoints/uteat/shipsear_v3"
+    },
+    "training_execution": {
+      "status": "待执行",
+      "progress": 25,
+      "stages": [
+        "数据加载",
+        "训练迭代",
+        "验证评估"
+      ],
+      "last_checkpoint_time": "2026-04-13 12:10"
+    },
+    "inference": {
+      "sample_path": "/data/test/sample_0203.wav",
+      "model_options": [
+        "UT-EAT-v3-best",
+        "UT-EAT-v2-lite"
+      ],
+      "status": "待执行",
+      "prediction": "pilotShip",
+      "confidence": "94.2%",
+      "latency": "17 ms"
+    },
+    "metrics": [
+      {
+        "name": "Accuracy",
+        "value": "93.4%"
+      },
+      {
+        "name": "Macro-F1",
+        "value": "0.912"
+      },
+      {
+        "name": "Precision",
+        "value": "0.918"
+      },
+      {
+        "name": "Recall",
+        "value": "0.907"
+      },
+      {
+        "name": "参数量",
+        "value": "1.8 M"
+      },
+      {
+        "name": "推理时延",
+        "value": "17 ms"
+      }
+    ],
+    "model_status": "已完成微调（可部署）",
+    "latest_test": "ShipsEar-TestSet-2026-04-13",
+    "preview_blocks": [
+      {
+        "title": "待测样本波形",
+        "preview": "~∿~~∿∿~  ~∿~",
+        "desc": "输入样本时间域特征示意。"
+      },
+      {
+        "title": "Mel 频谱缩略图",
+        "preview": "▁▂▃▄▅▆▇█",
+        "desc": "用于 UT-EAT 推理的频谱特征。"
+      },
+      {
+        "title": "预测结果卡片",
+        "preview": "Top-1: pilotShip (94.2%)",
+        "desc": "当前样本分类结果与置信度。"
+      }
+    ]
   }
 }

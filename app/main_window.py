@@ -5,6 +5,7 @@ from PyQt6.QtWidgets import QFrame, QHBoxLayout, QLabel, QMainWindow, QStackedWi
 from app.pages.data_page import DataPage
 from app.pages.generation_page import GenerationPage
 from app.pages.home_page import HomePage
+from app.pages.recognition_page import RecognitionPage
 from app.services.mock_data_service import MockDataService
 from app.styles.theme import APP_STYLE
 from app.widgets.nav_button import NavButton
@@ -42,7 +43,8 @@ class MainWindow(QMainWindow):
         self.page_stack.addWidget(self.data_page)
         self.generation_page = GenerationPage(self.mock_data["generation_page"])
         self.page_stack.addWidget(self.generation_page)
-        self.page_stack.addWidget(self._build_placeholder_page("轻量识别模块即将完善"))
+        self.recognition_page = RecognitionPage(self.mock_data["recognition_page"])
+        self.page_stack.addWidget(self.recognition_page)
         self.page_stack.addWidget(self._build_placeholder_page("结果中心模块即将完善"))
         body.addWidget(self.page_stack, 1)
 
