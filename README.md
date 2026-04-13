@@ -11,7 +11,7 @@ pip install -r requirements.txt
 python main.py
 ```
 
-## 当前版本（首页 + 数据管理页）
+## 当前版本（首页 + 数据管理页 + 可解释生成页）
 
 - 首页：浅色科研风总览工作台，展示完整链路与模块入口。
 - 数据管理页：围绕“数据接入与预处理”构建，包含：
@@ -21,7 +21,8 @@ python main.py
   - 预处理参数配置区
   - 预处理任务执行区
   - 预处理结果预览区
-- 左侧导航点击“数据管理”可进入该页面。
+- 左侧导航点击“数据管理 / 可解释生成”可进入对应页面。
+- 可解释生成页包含：生成任务配置、物理先验展示、参数配置、任务执行、结果预览、增强数据集构建。
 - 所有展示内容采用 `configs/mock_data.json`，便于后续替换为真实业务接口。
 
 ## 目录结构
@@ -33,6 +34,7 @@ app/
   pages/
     home_page.py
     data_page.py
+    generation_page.py
   widgets/
     nav_button.py
   styles/

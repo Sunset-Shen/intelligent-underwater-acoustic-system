@@ -1,7 +1,7 @@
 {
   "header_tags": [
     "当前模式：原型验证",
-    "当前阶段：5.3.1 数据接入与预处理"
+    "当前阶段：5.3.2 可解释生成与增强"
   ],
   "status_badges": [
     "系统状态：正常",
@@ -314,5 +314,97 @@
         "desc": "重采样与频谱缓存后可直接供 UT-EAT 使用。"
       }
     ]
+  },
+  "generation_page": {
+    "task_config": {
+      "datasets": [
+        "ShipsEar",
+        "DeepShip"
+      ],
+      "target_classes": [
+        "pilotShip",
+        "trawler",
+        "tugboat",
+        "Cargo",
+        "Tanker"
+      ],
+      "task_name": "GEN-Shipsear-Pilot-001",
+      "output_dir": "/outputs/generation/shipsear/pilotShip",
+      "target_samples": 240
+    },
+    "physical_priors": [
+      {
+        "name": "谱形态先验",
+        "status": "已加载",
+        "desc": "保持目标类别的主频带轮廓与谐波结构稳定。",
+        "preview": "▁▂▃▅▇▆▄▂"
+      },
+      {
+        "name": "能量结构先验",
+        "status": "已加载",
+        "desc": "约束低频/中频/高频能量分配比例。",
+        "preview": "▇▅▃｜▆▆▂｜▄▂▁"
+      },
+      {
+        "name": "调制谱先验",
+        "status": "已加载",
+        "desc": "保持包络调制节律，抑制非物理伪纹理。",
+        "preview": "~∿~∿~~ → ≋≋≋"
+      }
+    ],
+    "generation_params": {
+      "class_conditioned": true,
+      "sampling_steps": 80,
+      "guidance_scale": 3.5,
+      "batch_size": 16,
+      "noise_input": "Gaussian (seed=42)",
+      "enable_physical_prior": true,
+      "output_samples": 240
+    },
+    "execution": {
+      "status": "待执行",
+      "progress": 20,
+      "stages": [
+        "模板加载",
+        "类条件扩散采样",
+        "引导修正",
+        "样本保存"
+      ],
+      "last_run": "2026-04-13 11:10"
+    },
+    "result_preview": [
+      {
+        "title": "真实样本示意",
+        "preview": "~∿~~∿~ / ▁▂▃▄▅",
+        "sample_id": "real_0102",
+        "label": "pilotShip",
+        "quality": "参考样本"
+      },
+      {
+        "title": "生成样本示意",
+        "preview": "~∿~∿~~ / ▁▃▄▅▆",
+        "sample_id": "gen_0231",
+        "label": "pilotShip",
+        "quality": "可用"
+      }
+    ],
+    "dataset_build": {
+      "summary": [
+        {
+          "label": "原始样本数",
+          "value": "1,057"
+        },
+        {
+          "label": "新增增强样本",
+          "value": "240"
+        },
+        {
+          "label": "增强后总样本",
+          "value": "1,297"
+        }
+      ],
+      "distribution_change": "类别分布变化：pilotShip 13 → 253（增强前后对比），长尾类别均衡性提升。",
+      "output_dir": "/outputs/aug_dataset/shipsear_aug_v2"
+    }
   }
 }

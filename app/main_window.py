@@ -3,6 +3,7 @@ from __future__ import annotations
 from PyQt6.QtWidgets import QFrame, QHBoxLayout, QLabel, QMainWindow, QStackedWidget, QVBoxLayout, QWidget
 
 from app.pages.data_page import DataPage
+from app.pages.generation_page import GenerationPage
 from app.pages.home_page import HomePage
 from app.services.mock_data_service import MockDataService
 from app.styles.theme import APP_STYLE
@@ -39,7 +40,8 @@ class MainWindow(QMainWindow):
         self.page_stack.addWidget(self.home_page)
         self.data_page = DataPage(self.mock_data["data_page"])
         self.page_stack.addWidget(self.data_page)
-        self.page_stack.addWidget(self._build_placeholder_page("可解释生成模块即将完善"))
+        self.generation_page = GenerationPage(self.mock_data["generation_page"])
+        self.page_stack.addWidget(self.generation_page)
         self.page_stack.addWidget(self._build_placeholder_page("轻量识别模块即将完善"))
         self.page_stack.addWidget(self._build_placeholder_page("结果中心模块即将完善"))
         body.addWidget(self.page_stack, 1)
