@@ -147,9 +147,9 @@ class DataPage(QWidget):
         title.setObjectName("SectionTitle")
         col.addWidget(title)
 
-        self.class_table = QTableWidget(0, 3)
+        self.class_table = QTableWidget(0, 4)
         self.class_table.setObjectName("DataTable")
-        self.class_table.setHorizontalHeaderLabels(["类别", "样本数", "占比"])
+        self.class_table.setHorizontalHeaderLabels(["类别编号", "类别名称", "中文类别名", "样本数"])
         self.class_table.verticalHeader().setVisible(False)
         self.class_table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
         self.class_table.setSelectionMode(QTableWidget.SelectionMode.NoSelection)
@@ -357,12 +357,14 @@ class DataPage(QWidget):
 
         self.class_table.setRowCount(len(classes))
         for row, item in enumerate(classes):
-            self.class_table.setItem(row, 0, QTableWidgetItem(item["name"]))
-            self.class_table.setItem(row, 1, QTableWidgetItem(item["count"]))
-            self.class_table.setItem(row, 2, QTableWidgetItem(item["ratio"]))
+            self.class_table.setItem(row, 0, QTableWidgetItem(item["id"]))
+            self.class_table.setItem(row, 1, QTableWidgetItem(item["en_name"]))
+            self.class_table.setItem(row, 2, QTableWidgetItem(item["cn_name"]))
+            self.class_table.setItem(row, 3, QTableWidgetItem(item["count"]))
 
         split = dataset["split"]
-        self.split_info.setText(f"训练 / 验证 / 测试：{split['train']} / {split['val']} / {split['test']}")
+        total = dataset.get("total_samples", "-")
+        self.split_info.setText(f"总样本：{total}｜训练 / 验证 / 测试：{split['train']} / {split['val']} / {split['test']}")
 
     def _set_access_status(self, text: str) -> None:
         self.access_status.setText(f"接入状态：{text}")

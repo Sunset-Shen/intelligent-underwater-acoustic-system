@@ -116,17 +116,90 @@
       "ShipsEar": {
         "name": "ShipsEar",
         "path": "/data/acoustic/shipsear",
-        "class_count": "4 类",
-        "sample_count": "4,800 条",
+        "class_count": "12 类",
+        "sample_count": "1,057 条",
         "sample_rate": "44.1 kHz",
         "status": "已接入",
         "classes": [
-          {"name": "Cargo", "count": "1,260", "ratio": "26.3%"},
-          {"name": "Passengership", "count": "1,080", "ratio": "22.5%"},
-          {"name": "Tanker", "count": "1,320", "ratio": "27.5%"},
-          {"name": "Tug", "count": "1,140", "ratio": "23.7%"}
+          {
+            "id": "01",
+            "en_name": "motorboat",
+            "cn_name": "摩托艇",
+            "count": "99"
+          },
+          {
+            "id": "02",
+            "en_name": "pilotShip",
+            "cn_name": "引航船",
+            "count": "13"
+          },
+          {
+            "id": "03",
+            "en_name": "sailboat",
+            "cn_name": "帆船",
+            "count": "41"
+          },
+          {
+            "id": "04",
+            "en_name": "fishboat",
+            "cn_name": "渔船",
+            "count": "52"
+          },
+          {
+            "id": "05",
+            "en_name": "trawler",
+            "cn_name": "拖网渔船",
+            "count": "16"
+          },
+          {
+            "id": "06",
+            "en_name": "musselBoat",
+            "cn_name": "贻贝养殖船",
+            "count": "73"
+          },
+          {
+            "id": "07",
+            "en_name": "tugboat",
+            "cn_name": "拖船",
+            "count": "20"
+          },
+          {
+            "id": "08",
+            "en_name": "dredger",
+            "cn_name": "挖泥船",
+            "count": "26"
+          },
+          {
+            "id": "09",
+            "en_name": "passengerFerries",
+            "cn_name": "客运渡轮",
+            "count": "427"
+          },
+          {
+            "id": "10",
+            "en_name": "oceanLiner",
+            "cn_name": "远洋客轮",
+            "count": "93"
+          },
+          {
+            "id": "11",
+            "en_name": "oroVessels",
+            "cn_name": "滚装船",
+            "count": "83"
+          },
+          {
+            "id": "12",
+            "en_name": "naturalAmbientNoise",
+            "cn_name": "自然环境背景噪声",
+            "count": "114"
+          }
         ],
-        "split": {"train": "70%", "val": "15%", "test": "15%"}
+        "split": {
+          "train": "70%",
+          "val": "15%",
+          "test": "15%"
+        },
+        "total_samples": "1057"
       },
       "DeepShip": {
         "name": "DeepShip",
@@ -136,12 +209,37 @@
         "sample_rate": "48 kHz",
         "status": "已接入",
         "classes": [
-          {"name": "Cargo", "count": "1,420", "ratio": "25.4%"},
-          {"name": "Passengership", "count": "1,310", "ratio": "23.4%"},
-          {"name": "Tanker", "count": "1,550", "ratio": "27.7%"},
-          {"name": "Tug", "count": "1,320", "ratio": "23.5%"}
+          {
+            "id": "01",
+            "en_name": "cargo",
+            "cn_name": "货船",
+            "count": "1420"
+          },
+          {
+            "id": "02",
+            "en_name": "passenger",
+            "cn_name": "客船",
+            "count": "1310"
+          },
+          {
+            "id": "03",
+            "en_name": "tanker",
+            "cn_name": "油轮",
+            "count": "1550"
+          },
+          {
+            "id": "04",
+            "en_name": "tug",
+            "cn_name": "拖船",
+            "count": "1320"
+          }
         ],
-        "split": {"train": "70%", "val": "10%", "test": "20%"}
+        "split": {
+          "train": "70%",
+          "val": "10%",
+          "test": "20%"
+        },
+        "total_samples": "5600"
       },
       "本地导入": {
         "name": "Local-Import",
@@ -151,12 +249,37 @@
         "sample_rate": "待识别",
         "status": "待处理",
         "classes": [
-          {"name": "Cargo", "count": "-", "ratio": "-"},
-          {"name": "Passengership", "count": "-", "ratio": "-"},
-          {"name": "Tanker", "count": "-", "ratio": "-"},
-          {"name": "Tug", "count": "-", "ratio": "-"}
+          {
+            "id": "01",
+            "en_name": "cargo",
+            "cn_name": "货船",
+            "count": "-"
+          },
+          {
+            "id": "02",
+            "en_name": "passenger",
+            "cn_name": "客船",
+            "count": "-"
+          },
+          {
+            "id": "03",
+            "en_name": "tanker",
+            "cn_name": "油轮",
+            "count": "-"
+          },
+          {
+            "id": "04",
+            "en_name": "tug",
+            "cn_name": "拖船",
+            "count": "-"
+          }
         ],
-        "split": {"train": "待划分", "val": "待划分", "test": "待划分"}
+        "split": {
+          "train": "待划分",
+          "val": "待划分",
+          "test": "待划分"
+        },
+        "total_samples": "待统计"
       }
     },
     "preprocess_defaults": {
