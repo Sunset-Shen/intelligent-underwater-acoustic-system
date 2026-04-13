@@ -1,7 +1,7 @@
 {
   "header_tags": [
     "当前模式：原型验证",
-    "当前阶段：首页重构"
+    "当前阶段：5.3.1 数据接入与预处理"
   ],
   "status_badges": [
     "系统状态：正常",
@@ -98,5 +98,98 @@
       "desc": "实验日志已归档，报告版本 v0.3。",
       "metric": "Macro-F1 0.91"
     }
-  ]
+  ],
+  "data_page": {
+    "source_options": [
+      "ShipsEar",
+      "DeepShip",
+      "本地导入"
+    ],
+    "labels": {
+      "dataset_name": "数据集名称",
+      "class_count": "类别数量",
+      "sample_count": "样本数量",
+      "sample_rate": "采样率",
+      "status": "数据状态"
+    },
+    "datasets": {
+      "ShipsEar": {
+        "name": "ShipsEar",
+        "path": "/data/acoustic/shipsear",
+        "class_count": "4 类",
+        "sample_count": "4,800 条",
+        "sample_rate": "44.1 kHz",
+        "status": "已接入",
+        "classes": [
+          {"name": "Cargo", "count": "1,260", "ratio": "26.3%"},
+          {"name": "Passengership", "count": "1,080", "ratio": "22.5%"},
+          {"name": "Tanker", "count": "1,320", "ratio": "27.5%"},
+          {"name": "Tug", "count": "1,140", "ratio": "23.7%"}
+        ],
+        "split": {"train": "70%", "val": "15%", "test": "15%"}
+      },
+      "DeepShip": {
+        "name": "DeepShip",
+        "path": "/data/acoustic/deepship",
+        "class_count": "4 类",
+        "sample_count": "5,600 条",
+        "sample_rate": "48 kHz",
+        "status": "已接入",
+        "classes": [
+          {"name": "Cargo", "count": "1,420", "ratio": "25.4%"},
+          {"name": "Passengership", "count": "1,310", "ratio": "23.4%"},
+          {"name": "Tanker", "count": "1,550", "ratio": "27.7%"},
+          {"name": "Tug", "count": "1,320", "ratio": "23.5%"}
+        ],
+        "split": {"train": "70%", "val": "10%", "test": "20%"}
+      },
+      "本地导入": {
+        "name": "Local-Import",
+        "path": "/workspace/datasets/local_acoustic",
+        "class_count": "待扫描",
+        "sample_count": "待扫描",
+        "sample_rate": "待识别",
+        "status": "待处理",
+        "classes": [
+          {"name": "Cargo", "count": "-", "ratio": "-"},
+          {"name": "Passengership", "count": "-", "ratio": "-"},
+          {"name": "Tanker", "count": "-", "ratio": "-"},
+          {"name": "Tug", "count": "-", "ratio": "-"}
+        ],
+        "split": {"train": "待划分", "val": "待划分", "test": "待划分"}
+      }
+    },
+    "preprocess_defaults": {
+      "resample_rate": "16 kHz",
+      "slice_length": "10 s",
+      "slice_method": "无重叠切分",
+      "tail_policy": "小于 5 s 丢弃，5–10 s 保留",
+      "output_format": "spec.npy",
+      "generate_cache": true
+    },
+    "task_execution": {
+      "status": "待执行",
+      "progress": 20,
+      "total_samples": 4800,
+      "output_dir": "/outputs/preprocess/shipsear_v1",
+      "last_run": "2026-04-13 10:20"
+    },
+    "preview_blocks": [
+      {
+        "title": "原始波形缩略图",
+        "preview": "~∿~~∿∿~  ~∿~  ~~~~",
+        "desc": "原始音频片段在时间域的波形示意。"
+      },
+      {
+        "title": "切片结果预览",
+        "preview": "seg_001.npy  seg_002.npy  seg_003.npy",
+        "desc": "10 s 无重叠切分后形成标准样本片段。"
+      },
+      {
+        "title": "Mel 频谱示意",
+        "preview": "▁▂▃▄▅▆▇█  →  █▇▆▅▄▃▂▁",
+        "desc": "重采样与频谱缓存后可直接供 UT-EAT 使用。"
+      }
+    ]
+  }
 }

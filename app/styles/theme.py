@@ -258,6 +258,65 @@ QLabel#MetricBadge {
     font-size: 11px;
 }
 
+
+QLineEdit#InputControl,
+QComboBox#InputControl {
+    background: #ffffff;
+    border: 1px solid #d2e3f4;
+    border-radius: 8px;
+    padding: 6px 8px;
+    color: #264761;
+}
+
+QComboBox#InputControl::drop-down {
+    border: none;
+}
+
+QCheckBox#InputCheck {
+    color: #365a77;
+}
+
+QProgressBar#TaskProgress {
+    border: 1px solid #d2e3f4;
+    border-radius: 8px;
+    background: #f5f9fe;
+    text-align: center;
+    color: #2a4f70;
+}
+
+QProgressBar#TaskProgress::chunk {
+    background: #5f9bd8;
+    border-radius: 6px;
+}
+
+QTableWidget#DataTable {
+    background: #ffffff;
+    border: 1px solid #d9e5f2;
+    border-radius: 10px;
+    gridline-color: #e8eef6;
+}
+
+QTableWidget#DataTable::item {
+    padding: 4px;
+}
+
+QHeaderView::section {
+    background: #f0f6fd;
+    color: #365a77;
+    border: 0;
+    border-bottom: 1px solid #d9e5f2;
+    padding: 6px;
+    font-weight: 600;
+}
+
+QTextEdit#TaskLog {
+    background: #f8fbff;
+    border: 1px solid #d9e5f2;
+    border-radius: 10px;
+    color: #54708a;
+    padding: 6px;
+}
+
 QFrame#PlaceholderPanel {
     background: #ffffff;
     border: 1px dashed #c9d8e8;
