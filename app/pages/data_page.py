@@ -50,6 +50,8 @@ class DataPage(QWidget):
 
         root.addWidget(self._build_result_preview())
 
+        self._apply_selected_dataset(self.dataset_selector.currentText())
+
     def _build_header(self) -> QFrame:
         panel = QFrame()
         panel.setObjectName("CardPanel")
@@ -133,7 +135,6 @@ class DataPage(QWidget):
         self.access_status.setObjectName("SectionSub")
         col.addWidget(self.access_status)
 
-        self._apply_selected_dataset(self.dataset_selector.currentText())
         return panel
 
     def _build_dataset_overview(self) -> QFrame:
@@ -170,7 +171,6 @@ class DataPage(QWidget):
         split_layout.addWidget(split_tip)
 
         col.addWidget(split_card)
-        self._refresh_overview(self.dataset_selector.currentText())
         return panel
 
     def _build_preprocess_config(self) -> QFrame:
