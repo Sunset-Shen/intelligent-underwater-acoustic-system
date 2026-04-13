@@ -1,0 +1,102 @@
+{
+  "header_tags": [
+    "当前模式：原型验证",
+    "当前阶段：首页重构"
+  ],
+  "status_badges": [
+    "系统状态：正常",
+    "数据状态：已加载",
+    "模型状态：待联调"
+  ],
+  "process_items": [
+    {
+      "icon": "⧉",
+      "title": "数据接入与预处理",
+      "desc": "多源水声数据清洗、切片与标注规范化"
+    },
+    {
+      "icon": "◌",
+      "title": "可解释生成与增强",
+      "desc": "类条件扩散结合物理先验进行样本增强"
+    },
+    {
+      "icon": "◉",
+      "title": "轻量识别训练 / 推理",
+      "desc": "UT-EAT 面向低成本部署的训练与推理"
+    },
+    {
+      "icon": "☷",
+      "title": "结果输出与管理",
+      "desc": "统一汇总识别结果、日志与实验导出"
+    }
+  ],
+  "module_cards": [
+    {
+      "icon": "🗂",
+      "title": "数据管理",
+      "description": "统一管理多源水声数据集与标注版本",
+      "status": "已配置",
+      "status_style": "ModuleStatusReady",
+      "target_index": 1
+    },
+    {
+      "icon": "✦",
+      "title": "可解释生成",
+      "description": "面向目标特征约束的可解释增强流程",
+      "status": "待完善",
+      "status_style": "ModuleStatusPending",
+      "target_index": 2
+    },
+    {
+      "icon": "◍",
+      "title": "轻量识别",
+      "description": "低成本部署导向的识别训练与推理",
+      "status": "可运行",
+      "status_style": "ModuleStatusRunnable",
+      "target_index": 3
+    },
+    {
+      "icon": "☍",
+      "title": "结果中心",
+      "description": "汇总任务结果、日志与导出记录",
+      "status": "待完善",
+      "status_style": "ModuleStatusPending",
+      "target_index": 4
+    }
+  ],
+  "system_status": [
+    {
+      "label": "当前数据集",
+      "value": "ShipsEar / DeepShip"
+    },
+    {
+      "label": "当前生成模块",
+      "value": "类条件扩散 + 物理先验"
+    },
+    {
+      "label": "当前识别模型",
+      "value": "UT-EAT"
+    },
+    {
+      "label": "当前运行模式",
+      "value": "原型验证"
+    }
+  ],
+  "recent_records": [
+    {
+      "title": "最近生成任务",
+      "desc": "增强样本已输出，质量评估等级 A。",
+      "metric": "Quality A"
+    },
+    {
+      "title": "最近识别任务",
+      "desc": "识别推理已完成，目标类别 T-03。",
+      "metric": "Accuracy 93.4%"
+    },
+    {
+      "title": "最近导出记录",
+      "desc": "实验日志已归档，报告版本 v0.3。",
+      "metric": "Macro-F1 0.91"
+    }
+  ]
+}
