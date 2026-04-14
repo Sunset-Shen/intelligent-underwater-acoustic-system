@@ -55,10 +55,16 @@ class ResultImageLabel(QLabel):
         super().resizeEvent(event)
         self._update_scaled_pixmap()
 
+    def showEvent(self, event) -> None:
+        super().showEvent(event)
+        self._update_scaled_pixmap()
+
     def _update_scaled_pixmap(self) -> None:
         if self.original_pixmap is None:
             return
         avail = self.contentsRect().size()
+        if avail.width() < 20 or avail.height() < 20:
+            return
         scaled = self.original_pixmap.scaled(
             max(1, avail.width() - 6),
             max(1, avail.height() - 6),
