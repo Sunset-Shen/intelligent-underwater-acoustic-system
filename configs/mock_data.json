@@ -545,5 +545,131 @@
         ]
       }
     }
+  },
+  "results_page": {
+    "task_overview": {
+      "task_name": "SYS-JOINTTEST-ShipsEar-2026-04",
+      "dataset": "ShipsEar",
+      "mode": "联调测试 / 原型验证",
+      "status": "已完成",
+      "start_time": "2026-04-14 09:10",
+      "end_time": "2026-04-14 10:05",
+      "output_dir": "/outputs/system_joint_test/shipsear_v1"
+    },
+    "pipeline_steps": [
+      {
+        "name": "数据接入与预处理",
+        "status": "已完成"
+      },
+      {
+        "name": "可解释生成增强",
+        "status": "已完成"
+      },
+      {
+        "name": "增强数据集构建",
+        "status": "已完成"
+      },
+      {
+        "name": "轻量识别训练",
+        "status": "已完成"
+      },
+      {
+        "name": "测试样本推理",
+        "status": "已完成"
+      },
+      {
+        "name": "结果输出与归档",
+        "status": "已完成"
+      }
+    ],
+    "handoff_summary": [
+      {
+        "name": "原始样本数",
+        "value": "1,057"
+      },
+      {
+        "name": "预处理后样本数",
+        "value": "1,057"
+      },
+      {
+        "name": "新增增强样本数",
+        "value": "240"
+      },
+      {
+        "name": "增强后训练集规模",
+        "value": "1,297"
+      },
+      {
+        "name": "当前目标增强类别",
+        "value": "oceanLiner"
+      },
+      {
+        "name": "调用识别模型",
+        "value": "UT-EAT"
+      },
+      {
+        "name": "Checkpoint 路径",
+        "value": "/checkpoints/uteat/shipsear_v3/best.pt"
+      },
+      {
+        "name": "结果文件路径",
+        "value": "/outputs/system_joint_test/shipsear_v1/result_summary.json"
+      }
+    ],
+    "handoff_desc": "联调关系：预处理输出（清洗后样本）→ 生成模块输入；生成模块输出（增强样本）→ 识别训练输入；识别模块输出（分类结果与性能指标）→ 结果中心统一归档。",
+    "final_summary": [
+      {
+        "name": "最终识别类别",
+        "value": "pilotShip"
+      },
+      {
+        "name": "识别结果状态",
+        "value": "已完成"
+      },
+      {
+        "name": "Accuracy",
+        "value": "0.962617"
+      },
+      {
+        "name": "Macro-F1",
+        "value": "0.958000"
+      },
+      {
+        "name": "推理时延",
+        "value": "6.77 ms/sample"
+      },
+      {
+        "name": "Throughput",
+        "value": "348.96 samples/s"
+      },
+      {
+        "name": "日志文件状态",
+        "value": "已写入"
+      },
+      {
+        "name": "结果归档状态",
+        "value": "已归档"
+      }
+    ],
+    "logs": [
+      "2026-04-14 09:10:03 数据接入完成，ShipsEar 原始样本索引校验通过。",
+      "2026-04-14 09:13:21 预处理完成，输出标准化样本 1,057 条。",
+      "2026-04-14 09:18:09 可解释生成任务启动，目标类别 oceanLiner。",
+      "2026-04-14 09:27:45 增强样本保存完成，新增样本 240 条。",
+      "2026-04-14 09:30:08 增强数据集构建完成，总样本数 1,297。",
+      "2026-04-14 09:48:56 UT-EAT 训练完成，best checkpoint 已保存。",
+      "2026-04-14 09:55:16 测试样本推理完成，输出 Top-1 与性能摘要。",
+      "2026-04-14 10:05:02 结果文件归档完成，联调任务结束。"
+    ],
+    "preview_images": [
+      {
+        "title": "生成模块结果缩略图（物理一致性）",
+        "path": "assets/test_results/generation/mel_compare.png"
+      },
+      {
+        "title": "识别模块结果缩略图（整体指标）",
+        "path": "assets/test_results/recognition/shipsear_overall_metrics.png"
+      }
+    ]
   }
 }

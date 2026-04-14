@@ -6,6 +6,7 @@ from app.pages.data_page import DataPage
 from app.pages.generation_page import GenerationPage
 from app.pages.home_page import HomePage
 from app.pages.recognition_page import RecognitionPage
+from app.pages.results_page import ResultsPage
 from app.services.mock_data_service import MockDataService
 from app.styles.theme import APP_STYLE
 from app.widgets.nav_button import NavButton
@@ -45,7 +46,8 @@ class MainWindow(QMainWindow):
         self.page_stack.addWidget(self.generation_page)
         self.recognition_page = RecognitionPage(self.mock_data["recognition_page"])
         self.page_stack.addWidget(self.recognition_page)
-        self.page_stack.addWidget(self._build_placeholder_page("结果中心模块即将完善"))
+        self.results_page = ResultsPage(self.mock_data["results_page"])
+        self.page_stack.addWidget(self.results_page)
         body.addWidget(self.page_stack, 1)
 
         layout.addLayout(body, 1)
