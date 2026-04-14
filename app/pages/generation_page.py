@@ -25,7 +25,9 @@ from PyQt6.QtWidgets import (
 class ImagePreviewLabel(QLabel):
     def __init__(self, image_path: str, fallback: str, target_width: int = 420, target_height: int = 220) -> None:
         super().__init__()
-        self.image_path = Path(image_path)
+        raw_path = Path(image_path)
+        project_root = Path(__file__).resolve().parents[2]
+        self.image_path = raw_path if raw_path.is_absolute() else (project_root / raw_path)
         self.fallback = fallback
         self.target_width = target_width
         self.target_height = target_height
