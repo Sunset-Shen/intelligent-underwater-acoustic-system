@@ -322,15 +322,16 @@
         "DeepShip"
       ],
       "target_classes": [
+        "10_oceanLiner",
         "pilotShip",
         "trawler",
         "tugboat",
         "Cargo",
         "Tanker"
       ],
-      "task_name": "GEN-Shipsear-Pilot-001",
-      "output_dir": "/outputs/generation/shipsear/pilotShip",
-      "target_samples": 240
+      "task_name": "GEN-Shipsear-10_oceanLiner-001",
+      "output_dir": "/outputs/generation/shipsear/10_oceanLiner",
+      "target_samples": 300
     },
     "physical_priors": [
       {
@@ -362,8 +363,8 @@
       "output_samples": 240
     },
     "execution": {
-      "status": "已完成",
-      "progress": 100,
+      "status": "待执行",
+      "progress": 0,
       "stages": [
         "模板加载",
         "类条件扩散采样",

@@ -407,27 +407,13 @@ class GenerationPage(QWidget):
         title.setObjectName("SectionTitle")
         col.addWidget(title)
 
-        image_container = QScrollArea()
-        image_container.setWidgetResizable(True)
-        image_container.setFixedHeight(560)
-        image_container.setFrameShape(QFrame.Shape.NoFrame)
-
-        image_label = QLabel()
-        image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        image_label.setObjectName("ImagePreview")
-
-        curve_path = Path(__file__).resolve().parents[2] / self.data["guidance_curve"]["path"]
-        if curve_path.exists():
-            pix = QPixmap(str(curve_path))
-            if not pix.isNull():
-                image_label.setPixmap(pix.scaledToWidth(1080, Qt.TransformationMode.SmoothTransformation))
-            else:
-                image_label.setText(f"图像读取失败\n{curve_path}")
-        else:
-            image_label.setText(f"未找到图像\n{curve_path}")
-
-        image_container.setWidget(image_label)
-        col.addWidget(image_container)
+        image = ImagePreviewLabel(
+            self.data["guidance_curve"]["path"],
+            f"未找到图像\n{self.data['guidance_curve']['path']}",
+            target_width=1080,
+            target_height=1650,
+        )
+        col.addWidget(image)
 
         desc = QLabel(self.data["guidance_curve"]["desc"])
         desc.setObjectName("SectionSub")
