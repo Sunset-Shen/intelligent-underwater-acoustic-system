@@ -16,6 +16,7 @@ from PyQt6.QtWidgets import (
     QPushButton,
     QProgressBar,
     QScrollArea,
+    QSizePolicy,
     QTextEdit,
     QVBoxLayout,
     QWidget,
@@ -23,36 +24,48 @@ from PyQt6.QtWidgets import (
 
 
 class ResultImageLabel(QLabel):
-    def __init__(self, image_path: str, fallback: str, target_width: int = 520, target_height: int = 300) -> None:
+    def __init__(self, image_path: str, fallback: str, min_height: int = 320) -> None:
         super().__init__()
         raw_path = Path(image_path)
         project_root = Path(__file__).resolve().parents[2]
         self.image_path = raw_path if raw_path.is_absolute() else (project_root / raw_path)
         self.fallback = fallback
-        self.target_width = target_width
-        self.target_height = target_height
+        self.original_pixmap: QPixmap | None = None
 
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setObjectName("ImagePreview")
-        self.setMinimumHeight(target_height)
+        self.setMinimumHeight(min_height)
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self._load_once()
 
     def _load_once(self) -> None:
         if self.image_path.exists():
             pixmap = QPixmap(str(self.image_path))
             if not pixmap.isNull():
-                scaled = pixmap.scaled(
-                    self.target_width,
-                    self.target_height,
-                    Qt.AspectRatioMode.KeepAspectRatio,
-                    Qt.TransformationMode.SmoothTransformation,
-                )
-                self.setPixmap(scaled)
+                self.original_pixmap = pixmap
+                self._update_scaled_pixmap()
                 self.setText("")
                 return
 
+        self.original_pixmap = None
         self.setPixmap(QPixmap())
         self.setText(self.fallback)
+
+    def resizeEvent(self, event) -> None:
+        super().resizeEvent(event)
+        self._update_scaled_pixmap()
+
+    def _update_scaled_pixmap(self) -> None:
+        if self.original_pixmap is None:
+            return
+        avail = self.contentsRect().size()
+        scaled = self.original_pixmap.scaled(
+            max(1, avail.width() - 6),
+            max(1, avail.height() - 6),
+            Qt.AspectRatioMode.KeepAspectRatio,
+            Qt.TransformationMode.SmoothTransformation,
+        )
+        self.setPixmap(scaled)
 
 
 class RecognitionPage(QWidget):
@@ -407,7 +420,7 @@ class RecognitionPage(QWidget):
         col.addWidget(title)
 
         item = self.data["result_showcase"]["confusion_matrix"]
-        image = ResultImageLabel(item["path"], f"未找到图像\n{item['path']}", target_width=1080, target_height=430)
+        image = ResultImageLabel(item["path"], f"未找到图像\n{item['path']}", min_height=500)
         col.addWidget(image, 0, Qt.AlignmentFlag.AlignHCenter)
 
         desc = QLabel(item["desc"])
@@ -472,7 +485,8 @@ class RecognitionPage(QWidget):
         card.setObjectName("FlowItem")
         inner = QVBoxLayout(card)
         inner.setContentsMargins(8, 8, 8, 8)
-        image = ResultImageLabel(path, f"未找到图像\n{path}", target_width=width, target_height=height)
+        image = ResultImageLabel(path, f"未找到图像\n{path}", min_height=height)
+        card.setMinimumWidth(width)
         caption = QLabel(title)
         caption.setObjectName("SectionSub")
         caption.setWordWrap(True)
