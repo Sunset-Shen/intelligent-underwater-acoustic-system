@@ -27,23 +27,39 @@ class ImagePreviewLabel(QLabel):
         super().__init__()
         self.image_path = Path(image_path)
         self.fallback = fallback
+        self._raw_pixmap = QPixmap()
+        self._last_size = None
+
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setMinimumHeight(180)
         self.setObjectName("ImagePreview")
+        self._load_source()
         self._refresh_pixmap()
 
     def resizeEvent(self, event) -> None:  # type: ignore[override]
         super().resizeEvent(event)
         self._refresh_pixmap()
 
-    def _refresh_pixmap(self) -> None:
+    def _load_source(self) -> None:
         if self.image_path.exists():
-            pixmap = QPixmap(str(self.image_path))
-            if not pixmap.isNull():
-                scaled = pixmap.scaled(self.size(), Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
-                self.setPixmap(scaled)
-                self.setText("")
-                return
+            self._raw_pixmap = QPixmap(str(self.image_path))
+
+    def _refresh_pixmap(self) -> None:
+        size_key = (max(1, self.width()), max(1, self.height()))
+        if size_key == self._last_size:
+            return
+        self._last_size = size_key
+
+        if not self._raw_pixmap.isNull():
+            scaled = self._raw_pixmap.scaled(
+                self.size(),
+                Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.SmoothTransformation,
+            )
+            self.setPixmap(scaled)
+            self.setText("")
+            return
+
         self.setPixmap(QPixmap())
         self.setText(self.fallback)
 
