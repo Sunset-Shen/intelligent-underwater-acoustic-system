@@ -427,7 +427,8 @@ class RecognitionPage(QWidget):
 
         item = self.data["result_showcase"]["confusion_matrix"]
         image = ResultImageLabel(item["path"], f"未找到图像\n{item['path']}", min_height=500)
-        col.addWidget(image, 0, Qt.AlignmentFlag.AlignHCenter)
+        image.setMinimumWidth(980)
+        col.addWidget(image)
 
         desc = QLabel(item["desc"])
         desc.setObjectName("SectionSub")
