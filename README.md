@@ -47,3 +47,13 @@ configs/
   mock_data.json
 requirements.txt
 ```
+
+
+## 生成模块测试图资源
+
+- 页面会尝试加载 `assets/test_results/generation/` 下的测试图：
+  - `mel_compare.png`
+  - `energy_ratio_compare.png`
+  - `modspec_compare.png`
+  - `guidance_losses.png`
+- 若文件不存在，界面会显示占位提示，不会报错。

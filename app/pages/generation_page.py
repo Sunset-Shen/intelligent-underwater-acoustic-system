@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 from datetime import datetime
+from pathlib import Path
 
 from PyQt6.QtCore import QTimer, Qt
+from PyQt6.QtGui import QPixmap
 from PyQt6.QtWidgets import (
     QCheckBox,
     QComboBox,
@@ -13,10 +15,37 @@ from PyQt6.QtWidgets import (
     QLineEdit,
     QPushButton,
     QProgressBar,
+    QScrollArea,
     QTextEdit,
     QVBoxLayout,
     QWidget,
 )
+
+
+class ImagePreviewLabel(QLabel):
+    def __init__(self, image_path: str, fallback: str) -> None:
+        super().__init__()
+        self.image_path = Path(image_path)
+        self.fallback = fallback
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.setMinimumHeight(180)
+        self.setObjectName("ImagePreview")
+        self._refresh_pixmap()
+
+    def resizeEvent(self, event) -> None:  # type: ignore[override]
+        super().resizeEvent(event)
+        self._refresh_pixmap()
+
+    def _refresh_pixmap(self) -> None:
+        if self.image_path.exists():
+            pixmap = QPixmap(str(self.image_path))
+            if not pixmap.isNull():
+                scaled = pixmap.scaled(self.size(), Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+                self.setPixmap(scaled)
+                self.setText("")
+                return
+        self.setPixmap(QPixmap())
+        self.setText(self.fallback)
 
 
 class GenerationPage(QWidget):
@@ -28,7 +57,15 @@ class GenerationPage(QWidget):
         self._build_ui()
 
     def _build_ui(self) -> None:
-        root = QVBoxLayout(self)
+        wrapper = QVBoxLayout(self)
+        wrapper.setContentsMargins(0, 0, 0, 0)
+
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
+
+        content = QWidget()
+        root = QVBoxLayout(content)
         root.setContentsMargins(0, 0, 0, 0)
         root.setSpacing(12)
 
@@ -46,11 +83,13 @@ class GenerationPage(QWidget):
         middle.addWidget(self._build_execution_panel(), 1)
         root.addLayout(middle)
 
-        bottom = QHBoxLayout()
-        bottom.setSpacing(12)
-        bottom.addWidget(self._build_result_preview(), 1)
-        bottom.addWidget(self._build_dataset_build(), 1)
-        root.addLayout(bottom)
+        root.addWidget(self._build_result_preview())
+        root.addWidget(self._build_physical_consistency())
+        root.addWidget(self._build_guidance_curve())
+        root.addWidget(self._build_dataset_build())
+
+        scroll.setWidget(content)
+        wrapper.addWidget(scroll)
 
         self._refresh_task_info()
 
@@ -248,6 +287,8 @@ class GenerationPage(QWidget):
         self.progress_text = QLabel()
         self.progress_text.setObjectName("SectionSub")
 
+        self.output_info = QLabel(f"输出目录：{self.data['task_config']['output_dir']}")
+        self.output_info.setObjectName("SectionSub")
         self.last_time = QLabel(f"最近执行：{self.data['execution']['last_run']}")
         self.last_time.setObjectName("SectionSub")
 
@@ -255,6 +296,7 @@ class GenerationPage(QWidget):
         col.addWidget(self.stage_label)
         col.addWidget(self.progress_bar)
         col.addWidget(self.progress_text)
+        col.addWidget(self.output_info)
         col.addWidget(self.last_time)
 
         btn_row = QHBoxLayout()
@@ -272,8 +314,8 @@ class GenerationPage(QWidget):
         self.log_box = QTextEdit()
         self.log_box.setObjectName("TaskLog")
         self.log_box.setReadOnly(True)
-        self.log_box.setFixedHeight(96)
-        self.log_box.setText("运行日志：\n- 任务初始化完成。")
+        self.log_box.setFixedHeight(110)
+        self.log_box.setText("运行日志：\n- 任务初始化完成。\n- 先验模板加载完成。\n- 等待执行生成任务。")
         col.addWidget(self.log_box)
 
         self.timer = QTimer(self)
@@ -291,8 +333,8 @@ class GenerationPage(QWidget):
         title.setObjectName("SectionTitle")
         col.addWidget(title)
 
-        compare = QHBoxLayout()
-        compare.setSpacing(8)
+        row = QHBoxLayout()
+        row.setSpacing(8)
         for item in self.data["result_preview"]:
             card = QFrame()
             card.setObjectName("FlowItem")
@@ -305,12 +347,69 @@ class GenerationPage(QWidget):
             preview.setStyleSheet("font-size: 13px; color: #34658f;")
             tag = QLabel(f"{item['sample_id']} ｜ {item['label']} ｜ {item['quality']}")
             tag.setObjectName("RecentDesc")
+            summary = QLabel(item["summary"])
+            summary.setObjectName("SectionSub")
+            summary.setWordWrap(True)
             inner.addWidget(lab)
             inner.addWidget(preview)
             inner.addWidget(tag)
-            compare.addWidget(card, 1)
+            inner.addWidget(summary)
+            row.addWidget(card, 1)
 
-        col.addLayout(compare)
+        col.addLayout(row)
+        return panel
+
+    def _build_physical_consistency(self) -> QFrame:
+        panel = QFrame()
+        panel.setObjectName("CardPanel")
+        col = QVBoxLayout(panel)
+        col.setContentsMargins(16, 14, 16, 14)
+
+        title = QLabel("物理一致性对比结果")
+        title.setObjectName("SectionTitle")
+        col.addWidget(title)
+
+        grid = QGridLayout()
+        grid.setHorizontalSpacing(8)
+        grid.setVerticalSpacing(8)
+
+        for idx, item in enumerate(self.data["physical_consistency_images"]):
+            card = QFrame()
+            card.setObjectName("FlowItem")
+            inner = QVBoxLayout(card)
+            inner.setContentsMargins(8, 8, 8, 8)
+            image = ImagePreviewLabel(item["path"], f"未找到图像\n{item['path']}")
+            caption = QLabel(item["title"])
+            caption.setObjectName("RecentDesc")
+            caption.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            inner.addWidget(image)
+            inner.addWidget(caption)
+            grid.addWidget(card, 0, idx)
+
+        col.addLayout(grid)
+        return panel
+
+    def _build_guidance_curve(self) -> QFrame:
+        panel = QFrame()
+        panel.setObjectName("CardPanel")
+        col = QVBoxLayout(panel)
+        col.setContentsMargins(16, 14, 16, 14)
+
+        title = QLabel("引导约束损失曲线")
+        title.setObjectName("SectionTitle")
+        col.addWidget(title)
+
+        image = ImagePreviewLabel(
+            self.data["guidance_curve"]["path"],
+            f"未找到图像\n{self.data['guidance_curve']['path']}",
+        )
+        image.setMinimumHeight(320)
+        col.addWidget(image)
+
+        desc = QLabel(self.data["guidance_curve"]["desc"])
+        desc.setObjectName("SectionSub")
+        desc.setWordWrap(True)
+        col.addWidget(desc)
         return panel
 
     def _build_dataset_build(self) -> QFrame:
@@ -403,7 +502,7 @@ class GenerationPage(QWidget):
         self.start_btn.setText("开始生成")
         now = datetime.now().strftime("%Y-%m-%d %H:%M")
         self.last_time.setText(f"最近执行：{now}")
-        self._append_log("任务完成：增强样本已保存并可用于后续识别训练。")
+        self._append_log("任务完成：样本保存完成，结果汇总完成。")
         self._refresh_task_info()
 
     def _refresh_task_info(self) -> None:
@@ -415,6 +514,8 @@ class GenerationPage(QWidget):
         self.progress_text.setText(f"已生成样本：{done} / {total}")
 
     def _current_stage(self) -> str:
+        if self.progress >= 100:
+            return "样本保存完成 / 结果汇总完成"
         stages = self.data["execution"]["stages"]
         idx = min(self.progress // 25, len(stages) - 1)
         return stages[idx]

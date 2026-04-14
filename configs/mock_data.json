@@ -362,30 +362,32 @@
       "output_samples": 240
     },
     "execution": {
-      "status": "待执行",
-      "progress": 20,
+      "status": "已完成",
+      "progress": 100,
       "stages": [
         "模板加载",
         "类条件扩散采样",
         "引导修正",
         "样本保存"
       ],
-      "last_run": "2026-04-13 11:10"
+      "last_run": "2026-04-14 09:40"
     },
     "result_preview": [
       {
-        "title": "真实样本示意",
+        "title": "真实样本预览",
         "preview": "~∿~~∿~ / ▁▂▃▄▅",
-        "sample_id": "real_0102",
-        "label": "pilotShip",
-        "quality": "参考样本"
+        "sample_id": "real_10_oceanLiner",
+        "label": "oceanLiner",
+        "quality": "参考样本",
+        "summary": "真实样本用于对照生成结果的谱形态与能量结构。"
       },
       {
-        "title": "生成样本示意",
+        "title": "生成样本预览",
         "preview": "~∿~∿~~ / ▁▃▄▅▆",
-        "sample_id": "gen_0231",
-        "label": "pilotShip",
-        "quality": "可用"
+        "sample_id": "gen_10_oceanLiner_0231",
+        "label": "oceanLiner",
+        "quality": "可用样本",
+        "summary": "已通过物理先验约束校验，可纳入后续识别训练。"
       }
     ],
     "dataset_build": {
@@ -395,16 +397,34 @@
           "value": "1,057"
         },
         {
-          "label": "新增增强样本",
+          "label": "新增增强样本数",
           "value": "240"
         },
         {
-          "label": "增强后总样本",
+          "label": "增强后总样本数",
           "value": "1,297"
         }
       ],
-      "distribution_change": "类别分布变化：pilotShip 13 → 253（增强前后对比），长尾类别均衡性提升。",
+      "distribution_change": "目标类别变化：oceanLiner 增强前 93 条，增强后 333 条；类别均衡性明显提升。",
       "output_dir": "/outputs/aug_dataset/shipsear_aug_v2"
+    },
+    "physical_consistency_images": [
+      {
+        "title": "Mel频谱对比",
+        "path": "assets/test_results/generation/mel_compare.png"
+      },
+      {
+        "title": "能量结构对比",
+        "path": "assets/test_results/generation/energy_ratio_compare.png"
+      },
+      {
+        "title": "调制谱对比",
+        "path": "assets/test_results/generation/modspec_compare.png"
+      }
+    ],
+    "guidance_curve": {
+      "path": "assets/test_results/generation/guidance_losses.png",
+      "desc": "展示生成过程中各物理引导项的损失变化趋势。"
     }
   },
   "recognition_page": {

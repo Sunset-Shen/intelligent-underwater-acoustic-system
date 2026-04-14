@@ -259,6 +259,20 @@ QLabel#MetricBadge {
 }
 
 
+
+QScrollArea {
+    border: none;
+    background: transparent;
+}
+
+QLabel#ImagePreview {
+    border: 1px dashed #c6d8eb;
+    border-radius: 8px;
+    background: #f7fbff;
+    color: #6b839d;
+    padding: 10px;
+}
+
 QLineEdit#InputControl,
 QComboBox#InputControl {
     background: #ffffff;
