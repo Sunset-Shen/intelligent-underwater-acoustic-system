@@ -23,7 +23,7 @@ from PyQt6.QtWidgets import (
 
 
 class ImagePreviewLabel(QLabel):
-    def __init__(self, image_path: str, fallback: str, target_width: int = 420, target_height: int = 220) -> None:
+    def __init__(self, image_path: str, fallback: str, target_width: int = 520, target_height: int = 300) -> None:
         super().__init__()
         raw_path = Path(image_path)
         project_root = Path(__file__).resolve().parents[2]
@@ -35,7 +35,6 @@ class ImagePreviewLabel(QLabel):
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setObjectName("ImagePreview")
         self.setMinimumHeight(target_height)
-        self.setMaximumHeight(target_height)
 
         self._load_once()
 
@@ -387,13 +386,13 @@ class GenerationPage(QWidget):
             card.setObjectName("FlowItem")
             inner = QVBoxLayout(card)
             inner.setContentsMargins(8, 8, 8, 8)
-            image = ImagePreviewLabel(item["path"], f"未找到图像\n{item['path']}", target_width=360, target_height=200)
+            image = ImagePreviewLabel(item["path"], f"未找到图像\n{item['path']}", target_width=520, target_height=300)
             caption = QLabel(item["title"])
             caption.setObjectName("RecentDesc")
             caption.setAlignment(Qt.AlignmentFlag.AlignCenter)
             inner.addWidget(image)
             inner.addWidget(caption)
-            grid.addWidget(card, 0, idx)
+            grid.addWidget(card, idx // 2, idx % 2)
 
         col.addLayout(grid)
         return panel
@@ -408,13 +407,27 @@ class GenerationPage(QWidget):
         title.setObjectName("SectionTitle")
         col.addWidget(title)
 
-        image = ImagePreviewLabel(
-            self.data["guidance_curve"]["path"],
-            f"未找到图像\n{self.data['guidance_curve']['path']}",
-            target_width=980,
-            target_height=420,
-        )
-        col.addWidget(image)
+        image_container = QScrollArea()
+        image_container.setWidgetResizable(True)
+        image_container.setFixedHeight(560)
+        image_container.setFrameShape(QFrame.Shape.NoFrame)
+
+        image_label = QLabel()
+        image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        image_label.setObjectName("ImagePreview")
+
+        curve_path = Path(__file__).resolve().parents[2] / self.data["guidance_curve"]["path"]
+        if curve_path.exists():
+            pix = QPixmap(str(curve_path))
+            if not pix.isNull():
+                image_label.setPixmap(pix.scaledToWidth(1080, Qt.TransformationMode.SmoothTransformation))
+            else:
+                image_label.setText(f"图像读取失败\n{curve_path}")
+        else:
+            image_label.setText(f"未找到图像\n{curve_path}")
+
+        image_container.setWidget(image_label)
+        col.addWidget(image_container)
 
         desc = QLabel(self.data["guidance_curve"]["desc"])
         desc.setObjectName("SectionSub")
