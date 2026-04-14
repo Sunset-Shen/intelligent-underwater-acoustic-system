@@ -355,12 +355,15 @@ class GenerationPage(QWidget):
             preview.setStyleSheet("font-size: 13px; color: #34658f;")
             tag = QLabel(f"{item['sample_id']} ｜ {item['label']} ｜ {item['quality']}")
             tag.setObjectName("RecentDesc")
+            file_name = QLabel(f"文件名：{item.get('file_name', '--')}")
+            file_name.setObjectName("SectionSub")
             summary = QLabel(item["summary"])
             summary.setObjectName("SectionSub")
             summary.setWordWrap(True)
             inner.addWidget(lab)
             inner.addWidget(preview)
             inner.addWidget(tag)
+            inner.addWidget(file_name)
             inner.addWidget(summary)
             row.addWidget(card, 1)
 
@@ -380,19 +383,24 @@ class GenerationPage(QWidget):
         grid = QGridLayout()
         grid.setHorizontalSpacing(8)
         grid.setVerticalSpacing(8)
+        grid.setColumnStretch(0, 1)
+        grid.setColumnStretch(1, 1)
 
         for idx, item in enumerate(self.data["physical_consistency_images"]):
             card = QFrame()
             card.setObjectName("FlowItem")
             inner = QVBoxLayout(card)
             inner.setContentsMargins(8, 8, 8, 8)
-            image = ImagePreviewLabel(item["path"], f"未找到图像\n{item['path']}", target_width=520, target_height=300)
-            caption = QLabel(item["title"])
-            caption.setObjectName("RecentDesc")
-            caption.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            image = ImagePreviewLabel(item["path"], f"未找到图像\n{item['path']}", target_width=560, target_height=280)
+            lab = QLabel(item["title"])
+            lab.setObjectName("SectionSub")
             inner.addWidget(image)
-            inner.addWidget(caption)
-            grid.addWidget(card, idx // 2, idx % 2)
+            inner.addWidget(lab)
+
+            if idx < 2:
+                grid.addWidget(card, 0, idx)
+            else:
+                grid.addWidget(card, 1, 0, 1, 2, Qt.AlignmentFlag.AlignHCenter)
 
         col.addLayout(grid)
         return panel
@@ -403,17 +411,25 @@ class GenerationPage(QWidget):
         col = QVBoxLayout(panel)
         col.setContentsMargins(16, 14, 16, 14)
 
-        title = QLabel("引导约束损失曲线")
+        title = QLabel("可解释生成训练损失函数")
         title.setObjectName("SectionTitle")
         col.addWidget(title)
 
-        image = ImagePreviewLabel(
-            self.data["guidance_curve"]["path"],
-            f"未找到图像\n{self.data['guidance_curve']['path']}",
-            target_width=1080,
-            target_height=1650,
-        )
-        col.addWidget(image)
+        image_label = QLabel()
+        image_label.setObjectName("ImagePreview")
+        image_label.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignHCenter)
+
+        curve_path = Path(__file__).resolve().parents[2] / self.data["guidance_curve"]["path"]
+        if curve_path.exists():
+            pix = QPixmap(str(curve_path))
+            if not pix.isNull():
+                image_label.setPixmap(pix.scaledToWidth(1080, Qt.TransformationMode.SmoothTransformation))
+            else:
+                image_label.setText(f"图像读取失败\n{curve_path}")
+        else:
+            image_label.setText(f"未找到图像\n{curve_path}")
+
+        col.addWidget(image_label)
 
         desc = QLabel(self.data["guidance_curve"]["desc"])
         desc.setObjectName("SectionSub")

@@ -380,7 +380,8 @@
         "sample_id": "real_10_oceanLiner",
         "label": "oceanLiner",
         "quality": "参考样本",
-        "summary": "真实样本用于对照生成结果的谱形态与能量结构。"
+        "summary": "真实样本用于对照生成结果的谱形态与能量结构。",
+        "file_name": "real_10_oceanLiner.wav"
       },
       {
         "title": "生成样本预览",
@@ -388,7 +389,8 @@
         "sample_id": "gen_10_oceanLiner_0231",
         "label": "oceanLiner",
         "quality": "可用样本",
-        "summary": "已通过物理先验约束校验，可纳入后续识别训练。"
+        "summary": "已通过物理先验约束校验，可纳入后续识别训练。",
+        "file_name": "gen_10_oceanLiner_0231.wav"
       }
     ],
     "dataset_build": {
