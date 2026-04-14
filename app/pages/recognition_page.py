@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 from datetime import datetime
+from pathlib import Path
 
 from PyQt6.QtCore import QTimer, Qt
+from PyQt6.QtGui import QPixmap
 from PyQt6.QtWidgets import (
     QCheckBox,
     QComboBox,
@@ -13,10 +15,44 @@ from PyQt6.QtWidgets import (
     QLineEdit,
     QPushButton,
     QProgressBar,
+    QScrollArea,
     QTextEdit,
     QVBoxLayout,
     QWidget,
 )
+
+
+class ResultImageLabel(QLabel):
+    def __init__(self, image_path: str, fallback: str, target_width: int = 520, target_height: int = 300) -> None:
+        super().__init__()
+        raw_path = Path(image_path)
+        project_root = Path(__file__).resolve().parents[2]
+        self.image_path = raw_path if raw_path.is_absolute() else (project_root / raw_path)
+        self.fallback = fallback
+        self.target_width = target_width
+        self.target_height = target_height
+
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.setObjectName("ImagePreview")
+        self.setMinimumHeight(target_height)
+        self._load_once()
+
+    def _load_once(self) -> None:
+        if self.image_path.exists():
+            pixmap = QPixmap(str(self.image_path))
+            if not pixmap.isNull():
+                scaled = pixmap.scaled(
+                    self.target_width,
+                    self.target_height,
+                    Qt.AspectRatioMode.KeepAspectRatio,
+                    Qt.TransformationMode.SmoothTransformation,
+                )
+                self.setPixmap(scaled)
+                self.setText("")
+                return
+
+        self.setPixmap(QPixmap())
+        self.setText(self.fallback)
 
 
 class RecognitionPage(QWidget):
@@ -30,27 +66,35 @@ class RecognitionPage(QWidget):
     def _build_ui(self) -> None:
         root = QVBoxLayout(self)
         root.setContentsMargins(0, 0, 0, 0)
-        root.setSpacing(12)
+        root.setSpacing(0)
 
-        root.addWidget(self._build_header())
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
+
+        content = QWidget()
+        content_col = QVBoxLayout(content)
+        content_col.setContentsMargins(0, 0, 0, 0)
+        content_col.setSpacing(12)
+
+        content_col.addWidget(self._build_header())
 
         top = QHBoxLayout()
         top.setSpacing(12)
         top.addWidget(self._build_task_config(), 1)
         top.addWidget(self._build_model_config(), 1)
-        root.addLayout(top)
+        content_col.addLayout(top)
 
         middle = QHBoxLayout()
         middle.setSpacing(12)
         middle.addWidget(self._build_training_execution(), 1)
         middle.addWidget(self._build_inference_panel(), 1)
-        root.addLayout(middle)
+        content_col.addLayout(middle)
 
-        bottom = QHBoxLayout()
-        bottom.setSpacing(12)
-        bottom.addWidget(self._build_metrics_panel(), 1)
-        bottom.addWidget(self._build_preview_panel(), 1)
-        root.addLayout(bottom)
+        content_col.addWidget(self._build_test_results_showcase())
+
+        scroll.setWidget(content)
+        root.addWidget(scroll)
 
         self._refresh_train_view()
 
@@ -204,6 +248,8 @@ class RecognitionPage(QWidget):
         self.train_bar = QProgressBar()
         self.train_bar.setObjectName("TaskProgress")
         self.train_bar.setValue(self.train_progress)
+        self.train_progress_text = QLabel()
+        self.train_progress_text.setObjectName("SectionSub")
 
         self.checkpoint_time = QLabel(f"最近保存：{self.data['training_execution']['last_checkpoint_time']}")
         self.checkpoint_time.setObjectName("SectionSub")
@@ -211,6 +257,7 @@ class RecognitionPage(QWidget):
         col.addWidget(self.train_state)
         col.addWidget(self.epoch_state)
         col.addWidget(self.train_bar)
+        col.addWidget(self.train_progress_text)
         col.addWidget(self.loss_state)
         col.addWidget(self.acc_state)
         col.addWidget(self.checkpoint_time)
@@ -290,70 +337,148 @@ class RecognitionPage(QWidget):
 
         return panel
 
-    def _build_metrics_panel(self) -> QFrame:
+    def _build_test_results_showcase(self) -> QFrame:
         panel = QFrame()
         panel.setObjectName("CardPanel")
         col = QVBoxLayout(panel)
         col.setContentsMargins(16, 14, 16, 14)
 
-        title = QLabel("识别结果与性能指标")
+        title = QLabel("识别模块功能测试结果展示")
         title.setObjectName("SectionTitle")
         col.addWidget(title)
+        desc = QLabel("用于展示训练过程、识别性能、混淆矩阵与轻量化部署对比结果，支撑论文第 5.4.3 节截图。")
+        desc.setObjectName("SectionSub")
+        desc.setWordWrap(True)
+        col.addWidget(desc)
 
-        grid = QGridLayout()
-        grid.setHorizontalSpacing(8)
-        grid.setVerticalSpacing(8)
-
-        for i, item in enumerate(self.data["metrics"]):
-            card = QFrame()
-            card.setObjectName("FlowItem")
-            inner = QVBoxLayout(card)
-            inner.setContentsMargins(10, 8, 10, 8)
-            key = QLabel(item["name"])
-            key.setObjectName("KeyLabel")
-            value = QLabel(item["value"])
-            value.setObjectName("KeyValue")
-            inner.addWidget(key)
-            inner.addWidget(value)
-            grid.addWidget(card, i // 3, i % 3)
-
-        col.addLayout(grid)
-
-        status = QLabel(f"模型状态：{self.data['model_status']}｜最近测试：{self.data['latest_test']} ")
-        status.setObjectName("SectionSub")
-        col.addWidget(status)
+        col.addWidget(self._build_training_curves_card())
+        col.addWidget(self._build_performance_results_card())
+        col.addWidget(self._build_confusion_matrix_card())
+        col.addWidget(self._build_lightweight_compare_card())
 
         return panel
 
-    def _build_preview_panel(self) -> QFrame:
+    def _build_training_curves_card(self) -> QFrame:
         panel = QFrame()
-        panel.setObjectName("CardPanel")
+        panel.setObjectName("FlowItem")
         col = QVBoxLayout(panel)
-        col.setContentsMargins(16, 14, 16, 14)
+        col.setContentsMargins(12, 10, 12, 10)
 
-        title = QLabel("结果预览")
-        title.setObjectName("SectionTitle")
+        title = QLabel("训练过程可视化")
+        title.setObjectName("RecentTitle")
         col.addWidget(title)
 
-        for block in self.data["preview_blocks"]:
-            card = QFrame()
-            card.setObjectName("FlowItem")
-            inner = QVBoxLayout(card)
-            inner.setContentsMargins(10, 8, 10, 8)
-            t = QLabel(block["title"])
-            t.setObjectName("RecentTitle")
-            p = QLabel(block["preview"])
-            p.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            p.setStyleSheet("font-size: 13px; color: #34658f;")
-            d = QLabel(block["desc"])
-            d.setObjectName("RecentDesc")
-            d.setWordWrap(True)
-            inner.addWidget(t)
-            inner.addWidget(p)
-            inner.addWidget(d)
-            col.addWidget(card)
+        row = QHBoxLayout()
+        row.setSpacing(8)
+        for item in self.data["result_showcase"]["training_visuals"]:
+            card = self._build_image_card(item["title"], item["path"], 500, 300)
+            row.addWidget(card, 1)
+        col.addLayout(row)
 
         return panel
+
+    def _build_performance_results_card(self) -> QFrame:
+        panel = QFrame()
+        panel.setObjectName("FlowItem")
+        col = QVBoxLayout(panel)
+        col.setContentsMargins(12, 10, 12, 10)
+
+        title = QLabel("识别性能结果展示")
+        title.setObjectName("RecentTitle")
+        col.addWidget(title)
+
+        row = QHBoxLayout()
+        row.setSpacing(8)
+        for item in self.data["result_showcase"]["performance_visuals"]:
+            card = self._build_image_card(item["title"], item["path"], 500, 300)
+            row.addWidget(card, 1)
+        col.addLayout(row)
+
+        return panel
+
+    def _build_confusion_matrix_card(self) -> QFrame:
+        panel = QFrame()
+        panel.setObjectName("FlowItem")
+        col = QVBoxLayout(panel)
+        col.setContentsMargins(12, 10, 12, 10)
+
+        title = QLabel("混淆矩阵展示")
+        title.setObjectName("RecentTitle")
+        col.addWidget(title)
+
+        item = self.data["result_showcase"]["confusion_matrix"]
+        image = ResultImageLabel(item["path"], f"未找到图像\n{item['path']}", target_width=1080, target_height=430)
+        col.addWidget(image, 0, Qt.AlignmentFlag.AlignHCenter)
+
+        desc = QLabel(item["desc"])
+        desc.setObjectName("SectionSub")
+        desc.setWordWrap(True)
+        col.addWidget(desc)
+
+        return panel
+
+    def _build_lightweight_compare_card(self) -> QFrame:
+        panel = QFrame()
+        panel.setObjectName("FlowItem")
+        col = QVBoxLayout(panel)
+        col.setContentsMargins(12, 10, 12, 10)
+
+        title = QLabel("轻量化部署对比结果")
+        title.setObjectName("RecentTitle")
+        col.addWidget(title)
+
+        compare = self.data["result_showcase"]["lightweight_comparison"]
+        dataset = QLabel(f"数据集：{compare['dataset']}")
+        dataset.setObjectName("SectionSub")
+        col.addWidget(dataset)
+
+        table = QGridLayout()
+        table.setHorizontalSpacing(8)
+        table.setVerticalSpacing(6)
+
+        headers = ["模型", "Accuracy", "参数量", "模型体积", "FLOPs", "Latency", "Throughput"]
+        for idx, text in enumerate(headers):
+            h = QLabel(text)
+            h.setObjectName("KeyLabel")
+            table.addWidget(h, 0, idx)
+
+        for row, model in enumerate(compare["models"], start=1):
+            values = [
+                model["model"],
+                model["accuracy"],
+                model["params"],
+                model["size"],
+                model["flops"],
+                model["latency"],
+                model["throughput"],
+            ]
+            for col_idx, text in enumerate(values):
+                cell = QLabel(str(text))
+                cell.setObjectName("KeyValue" if col_idx == 0 else "SectionSub")
+                table.addWidget(cell, row, col_idx)
+
+        col.addLayout(table)
+
+        for line in compare["highlights"]:
+            tip = QLabel(f"• {line}")
+            tip.setObjectName("SectionSub")
+            tip.setWordWrap(True)
+            col.addWidget(tip)
+
+        return panel
+
+    def _build_image_card(self, title: str, path: str, width: int, height: int) -> QFrame:
+        card = QFrame()
+        card.setObjectName("FlowItem")
+        inner = QVBoxLayout(card)
+        inner.setContentsMargins(8, 8, 8, 8)
+        image = ResultImageLabel(path, f"未找到图像\n{path}", target_width=width, target_height=height)
+        caption = QLabel(title)
+        caption.setObjectName("SectionSub")
+        caption.setWordWrap(True)
+        inner.addWidget(image)
+        inner.addWidget(caption)
+        return card
 
     def _line_setting(self, layout: QGridLayout, row: int, name: str, value: str, key: str, readonly: bool = False) -> None:
         k = QLabel(name)
@@ -408,13 +533,20 @@ class RecognitionPage(QWidget):
         cfg = self.data["training_execution"]
         total_epochs = self.data["model_config"]["epochs"]
         current_epoch = max(1, int(total_epochs * self.train_progress / 100))
-        loss = 1.2 - 0.9 * (self.train_progress / 100)
-        acc = 0.65 + 0.29 * (self.train_progress / 100)
-        f1 = 0.61 + 0.31 * (self.train_progress / 100)
+        loss = cfg["initial_loss"] - (cfg["initial_loss"] - cfg["final_loss"]) * (self.train_progress / 100)
+        acc = cfg["initial_accuracy"] + (cfg["final_accuracy"] - cfg["initial_accuracy"]) * (self.train_progress / 100)
+        f1 = cfg["initial_macro_f1"] + (cfg["final_macro_f1"] - cfg["initial_macro_f1"]) * (self.train_progress / 100)
+
+        if cfg["status"] == "已完成" or self.train_progress >= 100:
+            current_epoch = total_epochs
+            loss = cfg["final_loss"]
+            acc = cfg["final_accuracy"]
+            f1 = cfg["final_macro_f1"]
 
         self.train_state.setText(f"当前任务状态：{cfg['status']}")
         self.epoch_state.setText(f"当前 Epoch：{current_epoch} / {total_epochs}｜阶段：{cfg['stages'][min(self.train_progress // 34, len(cfg['stages']) - 1)]}")
         self.train_bar.setValue(self.train_progress)
+        self.train_progress_text.setText(f"训练进度：{self.train_progress}%")
         self.loss_state.setText(f"当前 Loss：{loss:.4f}")
         self.acc_state.setText(f"当前 Accuracy / Macro-F1：{acc:.3f} / {f1:.3f}")
 

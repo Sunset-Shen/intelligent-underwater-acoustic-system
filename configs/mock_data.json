@@ -462,14 +462,20 @@
       "checkpoint_dir": "/checkpoints/uteat/shipsear_v3"
     },
     "training_execution": {
-      "status": "待执行",
-      "progress": 25,
+      "status": "训练中",
+      "progress": 62,
       "stages": [
         "数据加载",
         "训练迭代",
         "验证评估"
       ],
-      "last_checkpoint_time": "2026-04-13 12:10"
+      "last_checkpoint_time": "2026-04-14 09:25",
+      "initial_loss": 1.2831,
+      "final_loss": 0.1562,
+      "initial_accuracy": 0.654,
+      "final_accuracy": 0.963,
+      "initial_macro_f1": 0.612,
+      "final_macro_f1": 0.958
     },
     "inference": {
       "sample_path": "/data/test/sample_0203.wav",
@@ -482,50 +488,62 @@
       "confidence": "94.2%",
       "latency": "17 ms"
     },
-    "metrics": [
-      {
-        "name": "Accuracy",
-        "value": "93.4%"
+    "result_showcase": {
+      "training_visuals": [
+        {
+          "title": "UT-EAT预训练损失曲线",
+          "path": "assets/test_results/recognition/shipsear_uteat_pretrain_loss_curve.png"
+        },
+        {
+          "title": "微调阶段验证曲线",
+          "path": "assets/test_results/recognition/shipsear_finetune_curves.png"
+        }
+      ],
+      "performance_visuals": [
+        {
+          "title": "整体指标对比",
+          "path": "assets/test_results/recognition/shipsear_overall_metrics.png"
+        },
+        {
+          "title": "各类别准确率对比",
+          "path": "assets/test_results/recognition/shipsear_per_class_accuracy.png"
+        }
+      ],
+      "confusion_matrix": {
+        "title": "混淆矩阵图",
+        "path": "assets/test_results/recognition/shipsear_confusion_matrices.png",
+        "desc": "展示 EAT-base 与 UT-EAT 在 ShipsEar 数据集上的类别混淆情况。"
       },
-      {
-        "name": "Macro-F1",
-        "value": "0.912"
-      },
-      {
-        "name": "Precision",
-        "value": "0.918"
-      },
-      {
-        "name": "Recall",
-        "value": "0.907"
-      },
-      {
-        "name": "参数量",
-        "value": "1.8 M"
-      },
-      {
-        "name": "推理时延",
-        "value": "17 ms"
+      "lightweight_comparison": {
+        "dataset": "ShipsEar",
+        "models": [
+          {
+            "model": "EAT-base",
+            "accuracy": "0.990654",
+            "params": "85,264,908",
+            "size": "993.96 MB",
+            "flops": "48.57 G",
+            "latency": "19.36 ms/sample",
+            "throughput": "57.48 samples/s"
+          },
+          {
+            "model": "UT-EAT",
+            "accuracy": "0.962617",
+            "params": "8,507,916",
+            "size": "106.51 MB",
+            "flops": "5.57 G",
+            "latency": "6.77 ms/sample",
+            "throughput": "348.96 samples/s"
+          }
+        ],
+        "highlights": [
+          "UT-EAT 参数量约为 EAT-base 的 10.0%，显著降低部署存储压力。",
+          "UT-EAT 模型体积从 993.96 MB 降至 106.51 MB，便于边缘设备部署。",
+          "UT-EAT FLOPs 从 48.57 G 降至 5.57 G，推理复杂度明显下降。",
+          "UT-EAT 推理时延由 19.36 ms/sample 降至 6.77 ms/sample。",
+          "UT-EAT 吞吐量提升至 348.96 samples/s，约为 EAT-base 的 6.1 倍。"
+        ]
       }
-    ],
-    "model_status": "已完成微调（可部署）",
-    "latest_test": "ShipsEar-TestSet-2026-04-13",
-    "preview_blocks": [
-      {
-        "title": "待测样本波形",
-        "preview": "~∿~~∿∿~  ~∿~",
-        "desc": "输入样本时间域特征示意。"
-      },
-      {
-        "title": "Mel 频谱缩略图",
-        "preview": "▁▂▃▄▅▆▇█",
-        "desc": "用于 UT-EAT 推理的频谱特征。"
-      },
-      {
-        "title": "预测结果卡片",
-        "preview": "Top-1: pilotShip (94.2%)",
-        "desc": "当前样本分类结果与置信度。"
-      }
-    ]
+    }
   }
 }
