@@ -70,18 +70,31 @@ class MainWindow(QMainWindow):
         left.addWidget(subtitle)
         row.addLayout(left, 4)
 
+        mode_text = self.mock_data.get("current_mode", "联调模式")
+        stage_text = self.mock_data.get("current_stage", "5.4.4 系统联调测试")
+        header_tags = self.mock_data.get("header_tags") or [f"当前模式：{mode_text}", f"当前阶段：{stage_text}"]
+
         middle = QHBoxLayout()
         middle.setSpacing(8)
-        for text in self.mock_data["header_tags"]:
+        for text in header_tags:
             tag = QLabel(text)
             tag.setObjectName("HeaderTag")
             middle.addWidget(tag)
         row.addLayout(middle, 3)
 
+        badge_system = self.mock_data.get("badge_system_status", "正常")
+        badge_data = self.mock_data.get("badge_data_status", "已加载")
+        badge_model = self.mock_data.get("badge_model_status", "联调完成")
+        status_badges = self.mock_data.get("status_badges") or [
+            f"系统状态：{badge_system}",
+            f"数据状态：{badge_data}",
+            f"模型状态：{badge_model}",
+        ]
+
         right = QHBoxLayout()
         right.setSpacing(8)
         self.status_badges: dict[str, QLabel] = {}
-        for label in self.mock_data["status_badges"]:
+        for label in status_badges:
             badge = QLabel(label)
             badge.setObjectName("StatusBadge")
             self.status_badges[label.split("：")[0]] = badge

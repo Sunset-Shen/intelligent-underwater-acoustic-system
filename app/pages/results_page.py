@@ -10,7 +10,6 @@ from PyQt6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QScrollArea,
-    QTextEdit,
     QVBoxLayout,
     QWidget,
 )
@@ -62,11 +61,16 @@ class ResultsPage(QWidget):
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QFrame.Shape.NoFrame)
+        scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        scroll.setSizeAdjustPolicy(QScrollArea.SizeAdjustPolicy.AdjustToContents)
+        scroll.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
 
         content = QWidget()
         col = QVBoxLayout(content)
-        col.setContentsMargins(0, 0, 0, 0)
+        col.setContentsMargins(0, 0, 0, 12)
         col.setSpacing(12)
+        col.setSizeConstraint(QVBoxLayout.SizeConstraint.SetMinimumSize)
 
         col.addWidget(self._build_header())
         col.addWidget(self._build_task_overview())
@@ -223,12 +227,20 @@ class ResultsPage(QWidget):
         title.setObjectName("SectionTitle")
         col.addWidget(title)
 
-        log = QTextEdit()
-        log.setObjectName("TaskLog")
-        log.setReadOnly(True)
-        log.setFixedHeight(150)
-        log.setText("联调运行日志：\n" + "\n".join(f"- {line}" for line in self.data["logs"]))
-        col.addWidget(log)
+        log_wrap = QFrame()
+        log_wrap.setObjectName("TaskLog")
+        log_layout = QVBoxLayout(log_wrap)
+        log_layout.setContentsMargins(10, 8, 10, 8)
+        log_layout.setSpacing(6)
+        head = QLabel("联调运行日志：")
+        head.setObjectName("KeyLabel")
+        log_layout.addWidget(head)
+        for line in self.data["logs"]:
+            item = QLabel(f"• {line}")
+            item.setObjectName("SectionSub")
+            item.setWordWrap(True)
+            log_layout.addWidget(item)
+        col.addWidget(log_wrap)
         return panel
 
     def _build_preview(self) -> QFrame:
@@ -238,20 +250,29 @@ class ResultsPage(QWidget):
         col.setContentsMargins(16, 14, 16, 14)
         title = QLabel("结果预览缩略图")
         title.setObjectName("SectionTitle")
+        desc = QLabel("汇总展示生成模块与识别模块关键结果图，支持联调测试后统一回看。")
+        desc.setObjectName("SectionSub")
+        desc.setWordWrap(True)
         col.addWidget(title)
+        col.addWidget(desc)
 
-        row = QHBoxLayout()
-        row.setSpacing(8)
-        for item in self.data["preview_images"]:
+        grid = QGridLayout()
+        grid.setHorizontalSpacing(8)
+        grid.setVerticalSpacing(8)
+        grid.setColumnStretch(0, 1)
+        grid.setColumnStretch(1, 1)
+        for idx, item in enumerate(self.data["preview_images"]):
             card = QFrame()
             card.setObjectName("FlowItem")
+            card.setMinimumHeight(340)
             inner = QVBoxLayout(card)
             inner.setContentsMargins(8, 8, 8, 8)
-            img = ResultThumbLabel(item["path"], f"未找到图像\n{item['path']}", width=520, height=220)
+            img = ResultThumbLabel(item["path"], f"未找到图像\n{item['path']}", width=560, height=280)
             caption = QLabel(item["title"])
             caption.setObjectName("SectionSub")
+            caption.setWordWrap(True)
             inner.addWidget(img)
             inner.addWidget(caption)
-            row.addWidget(card, 1)
-        col.addLayout(row)
+            grid.addWidget(card, idx // 2, idx % 2)
+        col.addLayout(grid)
         return panel

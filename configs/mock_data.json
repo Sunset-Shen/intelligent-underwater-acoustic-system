@@ -1,12 +1,12 @@
 {
   "header_tags": [
-    "当前模式：原型验证",
-    "当前阶段：5.3.3 轻量识别训练与推理"
+    "当前模式：联调模式",
+    "当前阶段：5.4.4 系统联调测试"
   ],
   "status_badges": [
     "系统状态：正常",
     "数据状态：已加载",
-    "模型状态：待联调"
+    "模型状态：联调完成"
   ],
   "process_items": [
     {
@@ -79,7 +79,7 @@
     },
     {
       "label": "当前运行模式",
-      "value": "原型验证"
+      "value": "联调模式"
     }
   ],
   "recent_records": [
@@ -669,7 +669,40 @@
       {
         "title": "识别模块结果缩略图（整体指标）",
         "path": "assets/test_results/recognition/shipsear_overall_metrics.png"
+      },
+      {
+        "title": "生成模块结果缩略图（调制谱对比）",
+        "path": "assets/test_results/generation/modspec_compare.png"
+      },
+      {
+        "title": "识别模块结果缩略图（混淆矩阵）",
+        "path": "assets/test_results/recognition/shipsear_confusion_matrices.png"
+      },
+      {
+        "title": "生成模块结果缩略图（能量结构对比）",
+        "path": "assets/test_results/generation/energy_ratio_compare.png"
+      },
+      {
+        "title": "可解释生成训练损失函数",
+        "path": "assets/test_results/generation/guidance_losses.png"
+      },
+      {
+        "title": "识别模块结果缩略图（预训练损失曲线）",
+        "path": "assets/test_results/recognition/shipsear_uteat_pretrain_loss_curve.png"
+      },
+      {
+        "title": "识别模块结果缩略图（微调验证曲线）",
+        "path": "assets/test_results/recognition/shipsear_finetune_curves.png"
+      },
+      {
+        "title": "识别模块结果缩略图（各类别准确率）",
+        "path": "assets/test_results/recognition/shipsear_per_class_accuracy.png"
       }
     ]
-  }
+  },
+  "current_mode": "联调模式",
+  "current_stage": "5.4.4 系统联调测试",
+  "badge_system_status": "正常",
+  "badge_data_status": "已加载",
+  "badge_model_status": "联调完成"
 }
