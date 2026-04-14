@@ -23,42 +23,33 @@ from PyQt6.QtWidgets import (
 
 
 class ImagePreviewLabel(QLabel):
-    def __init__(self, image_path: str, fallback: str) -> None:
+    def __init__(self, image_path: str, fallback: str, target_width: int = 420, target_height: int = 220) -> None:
         super().__init__()
         self.image_path = Path(image_path)
         self.fallback = fallback
-        self._raw_pixmap = QPixmap()
-        self._last_size = None
+        self.target_width = target_width
+        self.target_height = target_height
 
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.setMinimumHeight(180)
         self.setObjectName("ImagePreview")
-        self._load_source()
-        self._refresh_pixmap()
+        self.setMinimumHeight(target_height)
+        self.setMaximumHeight(target_height)
 
-    def resizeEvent(self, event) -> None:  # type: ignore[override]
-        super().resizeEvent(event)
-        self._refresh_pixmap()
+        self._load_once()
 
-    def _load_source(self) -> None:
+    def _load_once(self) -> None:
         if self.image_path.exists():
-            self._raw_pixmap = QPixmap(str(self.image_path))
-
-    def _refresh_pixmap(self) -> None:
-        size_key = (max(1, self.width()), max(1, self.height()))
-        if size_key == self._last_size:
-            return
-        self._last_size = size_key
-
-        if not self._raw_pixmap.isNull():
-            scaled = self._raw_pixmap.scaled(
-                self.size(),
-                Qt.AspectRatioMode.KeepAspectRatio,
-                Qt.TransformationMode.SmoothTransformation,
-            )
-            self.setPixmap(scaled)
-            self.setText("")
-            return
+            pixmap = QPixmap(str(self.image_path))
+            if not pixmap.isNull():
+                scaled = pixmap.scaled(
+                    self.target_width,
+                    self.target_height,
+                    Qt.AspectRatioMode.KeepAspectRatio,
+                    Qt.TransformationMode.SmoothTransformation,
+                )
+                self.setPixmap(scaled)
+                self.setText("")
+                return
 
         self.setPixmap(QPixmap())
         self.setText(self.fallback)
@@ -394,7 +385,7 @@ class GenerationPage(QWidget):
             card.setObjectName("FlowItem")
             inner = QVBoxLayout(card)
             inner.setContentsMargins(8, 8, 8, 8)
-            image = ImagePreviewLabel(item["path"], f"未找到图像\n{item['path']}")
+            image = ImagePreviewLabel(item["path"], f"未找到图像\n{item['path']}", target_width=360, target_height=200)
             caption = QLabel(item["title"])
             caption.setObjectName("RecentDesc")
             caption.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -418,8 +409,9 @@ class GenerationPage(QWidget):
         image = ImagePreviewLabel(
             self.data["guidance_curve"]["path"],
             f"未找到图像\n{self.data['guidance_curve']['path']}",
+            target_width=980,
+            target_height=420,
         )
-        image.setMinimumHeight(320)
         col.addWidget(image)
 
         desc = QLabel(self.data["guidance_curve"]["desc"])
